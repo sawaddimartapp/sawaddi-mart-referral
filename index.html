@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Page</title>
+  
+  <!-- Firebase App (the core Firebase SDK) -->
   <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js"></script>
+  <!-- Firebase Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js"></script>
+  
 </head>
 <body>
   <h1>Product Details</h1>
@@ -21,7 +25,7 @@
       apiKey: "AIzaSyDBrqLoCgaSxTFRfggG5pyrWgpm9RD8pZs",
       authDomain: "sawaddimartapp-57822.firebaseapp.com",
       projectId: "sawaddimartapp-57822",
-      storageBucket: "gs://sawaddimartapp-57822.appspot.com", // Not required unless you're using Firebase Storage
+      storageBucket: "sawaddimartapp-57822.appspot.com",
       messagingSenderId: "749614159452",
       appId: "1:749614159452:android:ca1270231a131638267899"
     };
@@ -30,19 +34,20 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Get product ID from the URL using URLSearchParams for safer handling
+    // Get product ID and collection name from the URL using URLSearchParams
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('productId'); // Retrieve 'productId' from URL query params
+    const collectionName = urlParams.get('collectionName'); // Retrieve 'collectionName' from URL query params
 
-    if (!productId) {
-      document.getElementById("product-details").innerText = "Product ID is missing in the URL!";
+    if (!productId || !collectionName) {
+      document.getElementById("product-details").innerText = "Product ID or Collection Name is missing in the URL!";
     } else {
-      // Fetch product details from Firestore
-      db.collection("products").doc(productId).get().then((doc) => {
+      // Fetch product details from Firestore dynamically based on the collection name
+      db.collection("collections").doc(collectionName).collection('products').doc(productId).get().then((doc) => {
         if (doc.exists) {
-          document.getElementById("product-name").innerText = doc.data().name;
-          document.getElementById("product-description").innerText = doc.data().description;
-          document.getElementById("product-price").innerText = `Price: RM ${doc.data().price}`;
+          document.getElementById("product-name").innerText = doc.data().title || "No Title"; // Correct field names based on Firestore
+          document.getElementById("product-description").innerText = doc.data().description || "No Description";
+          document.getElementById("product-price").innerText = `Price: RM ${doc.data().price || "N/A"}`;
         } else {
           document.getElementById("product-details").innerText = "No such product found!";
         }
