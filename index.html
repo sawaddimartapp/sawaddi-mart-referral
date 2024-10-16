@@ -6,9 +6,9 @@
   <title>Product Page</title>
   
   <!-- Firebase App (the core Firebase SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <!-- Firebase Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   
 </head>
 <body>
@@ -34,20 +34,19 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Get product ID and collection name from the URL using URLSearchParams
+    // Get product ID from the URL using URLSearchParams
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('productId'); // Retrieve 'productId' from URL query params
-    const collectionName = urlParams.get('collectionName'); // Retrieve 'collectionName' from URL query params
 
-    if (!productId || !collectionName) {
-      document.getElementById("product-details").innerText = "Product ID or Collection Name is missing in the URL!";
+    if (!productId) {
+      document.getElementById("product-details").innerText = "Product ID is missing in the URL!";
     } else {
-      // Fetch product details from Firestore dynamically based on the collection name
-      db.collection("collections").doc(collectionName).collection('products').doc(productId).get().then((doc) => {
+      // Fetch product details from Firestore
+      db.collection("collections").doc('Food').collection('products').doc(productId).get().then((doc) => {
         if (doc.exists) {
-          document.getElementById("product-name").innerText = doc.data().title || "No Title"; // Correct field names based on Firestore
-          document.getElementById("product-description").innerText = doc.data().description || "No Description";
-          document.getElementById("product-price").innerText = `Price: RM ${doc.data().price || "N/A"}`;
+          document.getElementById("product-name").innerText = doc.data().title; // Correct field names based on Firestore
+          document.getElementById("product-description").innerText = doc.data().description;
+          document.getElementById("product-price").innerText = `Price: RM ${doc.data().price}`;
         } else {
           document.getElementById("product-details").innerText = "No such product found!";
         }
