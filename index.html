@@ -41,7 +41,7 @@
     if (!productId) {
       document.getElementById("product-details").innerText = "Product ID is missing in the URL!";
     } else {
-      // Fetch product details from Firestore
+      // Fetch product details from Firestore using productId
       db.collection("collections").doc('Food').collection('products').doc(productId).get().then((doc) => {
         if (doc.exists) {
           document.getElementById("product-name").innerText = doc.data().title; // Correct field names based on Firestore
