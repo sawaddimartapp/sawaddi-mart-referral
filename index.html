@@ -17,6 +17,7 @@
     <h2 id="product-name"></h2>
     <p id="product-description"></p>
     <p id="product-price"></p>
+    <p id="referrer-info"></p> <!-- To show referrer info -->
   </div>
 
   <script>
@@ -34,11 +35,13 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Get product ID and collection name from the URL using URLSearchParams
+    // Get product ID, collection name, and referrer ID from the URL using URLSearchParams
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('productId'); // Retrieve 'productId' from URL query params
     const collectionName = urlParams.get('collectionName'); // Retrieve 'collectionName' from URL query params
+    const referrerId = urlParams.get('referrerId'); // Retrieve 'referrerId' from URL query params
 
+    // Handle missing parameters
     if (!productId || !collectionName) {
       document.getElementById("product-details").innerText = "Product ID or Collection Name is missing in the URL!";
     } else {
@@ -48,6 +51,14 @@
           document.getElementById("product-name").innerText = doc.data().title || "No Title"; // Correct field names based on Firestore
           document.getElementById("product-description").innerText = doc.data().description || "No Description";
           document.getElementById("product-price").innerText = `Price: RM ${doc.data().price || "N/A"}`;
+          
+          // Display referrer info if available
+          if (referrerId) {
+            document.getElementById("referrer-info").innerText = `Referred by: ${referrerId}`;
+          } else {
+            document.getElementById("referrer-info").innerText = "No referrer information.";
+          }
+
         } else {
           document.getElementById("product-details").innerText = "No such product found!";
         }
