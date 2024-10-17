@@ -17,6 +17,10 @@
     <h2 id="product-name"></h2>
     <p id="product-description"></p>
     <p id="product-price"></p>
+    <p id="product-ingredients"></p>
+    <p id="product-delivery-fee"></p>
+    <p id="product-stock"></p>
+    <img id="product-image" src="" alt="Product Image">
   </div>
 
   <script>
@@ -37,16 +41,27 @@
     // Get product ID from the URL using URLSearchParams
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('productId'); // Retrieve 'productId' from URL query params
+    const collectionName = "Food"; // You can dynamically change this based on your category
 
     if (!productId) {
       document.getElementById("product-details").innerText = "Product ID is missing in the URL!";
     } else {
       // Fetch product details from Firestore using productId
-      db.collection("collections").doc('Food').collection('products').doc(productId).get().then((doc) => {
+      db.collection("collections").doc(collectionName).collection('products').doc(productId).get().then((doc) => {
         if (doc.exists) {
-          document.getElementById("product-name").innerText = doc.data().title; // Correct field names based on Firestore
-          document.getElementById("product-description").innerText = doc.data().description;
-          document.getElementById("product-price").innerText = `Price: RM ${doc.data().price}`;
+          const productData = doc.data();
+          document.getElementById("product-name").innerText = productData.title;
+          document.getElementById("product-description").innerText = productData.description;
+          document.getElementById("product-price").innerText = `Price: RM ${productData.price}`;
+          document.getElementById("product-ingredients").innerText = `Ingredients: ${productData.ingredients}`;
+          document.getElementById("product-stock").innerText = `Stock: ${productData.stock}`;
+          document.getElementById("product-delivery-fee").innerText = `West Malaysia Delivery Fee: RM ${productData.westMalaysiaDeliveryFee || "N/A"}`;
+
+          // Set product image (if exists)
+          const productImage = productData.images && productData.images.length > 0 ? productData.images[0] : '';
+          if (productImage) {
+            document.getElementById("product-image").src = productImage;
+          }
         } else {
           document.getElementById("product-details").innerText = "No such product found!";
         }
